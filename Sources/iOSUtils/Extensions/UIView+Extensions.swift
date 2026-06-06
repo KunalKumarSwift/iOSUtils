@@ -1,3 +1,7 @@
+/// Convenience helpers added to `UIView` for layout, styling, and animation.
+///
+/// All methods produce side-effects only on the receiver view.
+/// No environment variables are consumed here.
 #if canImport(UIKit)
 import UIKit
 

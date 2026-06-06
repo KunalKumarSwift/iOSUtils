@@ -1,3 +1,8 @@
+/// Read-only device and app metadata helpers.
+///
+/// All properties are static and read from system APIs at call time.
+/// Does not use the Facade pattern because there is no swappable backend.
+/// No environment variables are consumed here.
 #if canImport(UIKit)
 import UIKit
 

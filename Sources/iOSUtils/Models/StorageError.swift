@@ -1,0 +1,32 @@
+/// Value type representing all errors that can originate from storage providers.
+///
+/// Kept as a separate model file so both provider implementations and call
+/// sites can import it without coupling to any concrete provider.
+///
+/// Environment variables: none.
+import Foundation
+
+/// Errors thrown by any `StorageProviding` implementation.
+public enum StorageError: LocalizedError {
+
+    /// No value is stored under the requested key.
+    case notFound
+
+    /// The stored bytes could not be decoded into the requested type.
+    case decodingFailed
+
+    /// The value could not be encoded for storage.
+    case encodingFailed
+
+    /// An unexpected system-level error occurred; the associated value is the raw status code.
+    case systemError(OSStatus)
+
+    public var errorDescription: String? {
+        switch self {
+        case .notFound:          return "No value found for the requested key."
+        case .decodingFailed:    return "Stored data could not be decoded."
+        case .encodingFailed:    return "Value could not be encoded for storage."
+        case .systemError(let s): return "Storage system error (status \(s))."
+        }
+    }
+}

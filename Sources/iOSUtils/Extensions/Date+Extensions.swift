@@ -1,3 +1,7 @@
+/// Value-level helpers added to `Date` for common iOS date/time tasks.
+///
+/// Uses `Calendar.current` throughout; all operations are pure and locale-aware.
+/// No environment variables are consumed here.
 import Foundation
 
 public extension Date {

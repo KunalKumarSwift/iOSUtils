@@ -1,3 +1,7 @@
+/// Value-level helpers added to `Array` and `Collection` for common iOS tasks.
+///
+/// All helpers are pure and free of side effects.
+/// No environment variables are consumed here.
 import Foundation
 
 public extension Array {

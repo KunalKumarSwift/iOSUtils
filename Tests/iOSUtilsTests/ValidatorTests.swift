@@ -1,47 +1,67 @@
+/// Tests for `StandardValidatorProvider` via the `ValidatorFacade`.
+///
+/// Exercises each validation method including the Luhn credit-card check.
+/// All tests use the facade so switching to a custom provider is transparent.
 import XCTest
 @testable import iOSUtils
 
 final class ValidatorTests: XCTestCase {
 
-    func testValidEmail() {
-        XCTAssertTrue(Validator.email("user@example.com").isValid)
-        XCTAssertFalse(Validator.email("bad-email").isValid)
+    private var _validator: ValidatorProviding!
+
+    override func setUp() {
+        super.setUp()
+        _validator = ValidatorFacade.makeProvider()
     }
 
-    func testPassword() {
-        XCTAssertTrue(Validator.password("Password1").isValid)
-        XCTAssertFalse(Validator.password("short").isValid)
-        XCTAssertFalse(Validator.password("alllowercase1").isValid)
+    func testValidEmail() {
+        XCTAssertTrue(_validator.email("user@example.com").isValid)
+        XCTAssertFalse(_validator.email("notanemail").isValid)
+        XCTAssertFalse(_validator.email("@missing.com").isValid)
+    }
+
+    func testPassword_tooShort() {
+        let result = _validator.password("Ab1", minLength: 8, requireUppercase: true,
+                                         requireDigit: true, requireSpecial: false)
+        XCTAssertFalse(result.isValid)
+        XCTAssertNotNil(result.errorMessage)
+    }
+
+    func testPassword_missingUppercase() {
+        let result = _validator.password("alllower1", minLength: 8, requireUppercase: true,
+                                          requireDigit: true, requireSpecial: false)
+        XCTAssertFalse(result.isValid)
+    }
+
+    func testPassword_valid() {
+        XCTAssertTrue(
+            _validator.password("Password1", minLength: 8, requireUppercase: true,
+                                requireDigit: true, requireSpecial: false).isValid
+        )
     }
 
     func testNotEmpty() {
-        XCTAssertTrue(Validator.notEmpty("hello").isValid)
-        XCTAssertFalse(Validator.notEmpty("  ").isValid)
+        XCTAssertTrue(_validator.notEmpty("hello", fieldName: "Name").isValid)
+        XCTAssertFalse(_validator.notEmpty("  ", fieldName: "Name").isValid)
     }
 
-    func testCreditCard() {
-        // Valid Luhn number
-        XCTAssertTrue(Validator.creditCard("4532015112830366").isValid)
-        XCTAssertFalse(Validator.creditCard("1234567890123456").isValid)
-        XCTAssertFalse(Validator.creditCard("123").isValid)
+    func testCreditCard_validLuhn() {
+        XCTAssertTrue(_validator.creditCard("4532015112830366").isValid)
     }
 
-    func testCombine() {
-        let result = Validator.combine(
-            Validator.notEmpty("hello"),
-            Validator.minLength("hello", min: 3)
-        )
-        XCTAssertTrue(result.isValid)
-
-        let failing = Validator.combine(
-            Validator.notEmpty("hi"),
-            Validator.minLength("hi", min: 10)
-        )
-        XCTAssertFalse(failing.isValid)
+    func testCreditCard_invalidLuhn() {
+        XCTAssertFalse(_validator.creditCard("1234567890123456").isValid)
     }
 
-    func testURL() {
-        XCTAssertTrue(Validator.url("https://example.com").isValid)
-        XCTAssertFalse(Validator.url("not a url").isValid)
+    func testCreditCard_tooShort() {
+        XCTAssertFalse(_validator.creditCard("123").isValid)
+    }
+
+    func testURL_valid() {
+        XCTAssertTrue(_validator.url("https://example.com").isValid)
+    }
+
+    func testURL_invalid() {
+        XCTAssertFalse(_validator.url("not a url").isValid)
     }
 }

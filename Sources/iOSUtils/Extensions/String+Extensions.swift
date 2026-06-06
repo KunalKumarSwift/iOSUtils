@@ -1,3 +1,7 @@
+/// Value-level helpers added to `String` for common iOS tasks.
+///
+/// All helpers are pure functions or computed properties with no side effects.
+/// No environment variables are consumed here.
 import Foundation
 #if canImport(UIKit)
 import UIKit

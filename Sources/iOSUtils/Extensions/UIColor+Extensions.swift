@@ -1,3 +1,7 @@
+/// Value-level helpers added to `UIColor` for hex parsing, manipulation, and generation.
+///
+/// All methods are pure and produce new `UIColor` instances without mutation.
+/// No environment variables are consumed here.
 #if canImport(UIKit)
 import UIKit
 
