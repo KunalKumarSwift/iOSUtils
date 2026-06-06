@@ -2,11 +2,13 @@
 ///
 /// Suitable for sensitive data (tokens, passwords). Selected when
 /// IOSUTILS_STORAGE_PROVIDER=keychain. Operations are synchronous.
+/// Guarded by `#if canImport(Security)` — not available on Linux.
 ///
 /// Environment variables:
 ///   IOSUTILS_STORAGE_PROVIDER  – set to "keychain" to activate.
 ///   IOSUTILS_KEYCHAIN_SERVICE  – service name; defaults to the bundle ID.
 ///   IOSUTILS_KEYCHAIN_GROUP    – optional access group for shared keychain.
+#if canImport(Security)
 import Foundation
 import Security
 
@@ -93,3 +95,4 @@ public final class KeychainStorageProvider: StorageProviding {
         return q
     }
 }
+#endif

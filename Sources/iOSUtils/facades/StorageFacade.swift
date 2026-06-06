@@ -23,7 +23,13 @@ public enum StorageFacade {
     /// - Note: Always returns a valid provider; unknown values fall back to `UserDefaultsStorageProvider`.
     public static func makeProvider() -> StorageProviding {
         switch _providerKey.lowercased() {
-        case "keychain": return KeychainStorageProvider()
+        case "keychain":
+            #if canImport(Security)
+            return KeychainStorageProvider()
+            #else
+            // Keychain is unavailable on Linux; fall back to UserDefaults.
+            return UserDefaultsStorageProvider()
+            #endif
         case "memory":   return InMemoryStorageProvider()
         default:         return UserDefaultsStorageProvider()
         }
