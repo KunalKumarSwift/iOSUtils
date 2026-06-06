@@ -18,9 +18,12 @@ public final class UserDefaultsStorageProvider: StorageProviding {
 
     /// Initialise the provider.
     ///
-    /// - Parameter store: The `UserDefaults` suite to use; defaults to `.standard`.
-    public init(store: UserDefaults = _suite.flatMap(UserDefaults.init) ?? .standard) {
-        _store = store
+    /// - Parameter store: The `UserDefaults` suite to use; pass `nil` to resolve
+    ///   from `IOSUTILS_USERDEFAULTS_SUITE`, falling back to `.standard`.
+    public init(store: UserDefaults? = nil) {
+        // Private file-scope constants cannot be used as public default-parameter values;
+        // resolve here in the body instead.
+        _store = store ?? _suite.flatMap(UserDefaults.init) ?? .standard
     }
 
     public func set(_ value: String, forKey key: String) throws {

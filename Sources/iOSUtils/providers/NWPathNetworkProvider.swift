@@ -2,11 +2,13 @@
 ///
 /// Uses `NWPathMonitor` to observe connectivity changes. Selected when
 /// IOSUTILS_NETWORK_PROVIDER=nwpath (the default on device).
+/// Guarded by `#if canImport(Network)` — not available on Linux.
 /// Status changes are always dispatched to the main thread before invoking
 /// `onStatusChange`.
 ///
 /// Environment variables:
 ///   IOSUTILS_NETWORK_PROVIDER – set to "nwpath" to activate (default).
+#if canImport(Network)
 import Network
 import Foundation
 
@@ -48,3 +50,4 @@ public final class NWPathNetworkProvider: NetworkMonitoring {
         return .unknown
     }
 }
+#endif

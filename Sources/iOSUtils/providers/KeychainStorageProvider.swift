@@ -12,13 +12,13 @@
 import Foundation
 import Security
 
-// Read at module load so values are stable for the process lifetime.
-private let _service: String =
+// Renamed to avoid shadowing the same-named instance properties in default-parameter position.
+private let _defaultService: String =
     ProcessInfo.processInfo.environment["IOSUTILS_KEYCHAIN_SERVICE"]
     ?? Bundle.main.bundleIdentifier
     ?? "com.iosutils.keychain"
 
-private let _group: String? =
+private let _defaultGroup: String? =
     ProcessInfo.processInfo.environment["IOSUTILS_KEYCHAIN_GROUP"]
 
 /// Stores and retrieves data using the iOS Security framework Keychain.
@@ -30,11 +30,15 @@ public final class KeychainStorageProvider: StorageProviding {
     /// Initialise the provider.
     ///
     /// - Parameters:
-    ///   - service: Keychain service identifier; defaults to env var or bundle ID.
-    ///   - group: Optional access group for cross-app keychain sharing.
-    public init(service: String = _service, group: String? = _group) {
-        self._service = service
-        self._group = group
+    ///   - service: Keychain service identifier; pass `nil` to resolve from
+    ///     `IOSUTILS_KEYCHAIN_SERVICE`, falling back to the bundle ID.
+    ///   - group: Optional access group for cross-app keychain sharing; pass `nil`
+    ///     to resolve from `IOSUTILS_KEYCHAIN_GROUP`.
+    public init(service: String? = nil, group: String? = nil) {
+        // Private file-scope constants cannot be used as public default-parameter values;
+        // resolve here in the body instead.
+        self._service = service ?? _defaultService
+        self._group = group ?? _defaultGroup
     }
 
     public func set(_ value: String, forKey key: String) throws {
