@@ -25,7 +25,7 @@ final class StringExtensionsTests: XCTestCase {
     }
 
     func testCamelCased() {
-        XCTAssertEqual("hello-world".camelCased(), "helloworld")
+        XCTAssertEqual("hello-world".camelCased(), "helloWorld")
         XCTAssertEqual("my variable name".camelCased(), "myVariableName")
     }
 
