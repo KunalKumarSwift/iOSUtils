@@ -45,9 +45,14 @@ public extension Date {
     }
 
     func relativeFormatted() -> String {
+        // RelativeDateTimeFormatter is unavailable on Linux; fall back to a readable absolute format.
+        #if canImport(Darwin)
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full
         return formatter.localizedString(for: self, relativeTo: Date())
+        #else
+        return formatted("yyyy-MM-dd HH:mm")
+        #endif
     }
 
     func daysBetween(_ date: Date) -> Int {
