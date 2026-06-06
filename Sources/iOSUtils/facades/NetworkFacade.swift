@@ -1,0 +1,38 @@
+/// Selects and returns the active `NetworkMonitoring` implementation.
+///
+/// Contains zero implementation logic — only reads the environment variable
+/// and instantiates the correct provider. All monitoring logic lives in providers/.
+/// To add a backend: create one conforming file, add one `case` below.
+/// On Linux, `NWPathNetworkProvider` is unavailable; the "nwpath" key falls
+/// back to `MockNetworkProvider` so the package still compiles and tests run.
+///
+/// Environment variables:
+///   IOSUTILS_NETWORK_PROVIDER – "nwpath" | "mock"
+///                               Defaults to "nwpath".
+import Foundation
+
+// Read once at module load; stable for the process lifetime.
+private let _providerKey: String =
+    ProcessInfo.processInfo.environment["IOSUTILS_NETWORK_PROVIDER"]
+    ?? "nwpath"
+
+/// Factory that vends the correct `NetworkMonitoring` instance.
+public enum NetworkFacade {
+
+    /// Return the network monitor configured by `IOSUTILS_NETWORK_PROVIDER`.
+    ///
+    /// - Returns: A fully initialised `NetworkMonitoring` implementation.
+    /// - Note: On Linux, NWPathMonitor is unavailable; "nwpath" falls back to `MockNetworkProvider`.
+    public static func makeProvider() -> NetworkMonitoring {
+        switch _providerKey.lowercased() {
+        case "mock": return MockNetworkProvider()
+        default:
+            #if canImport(Network)
+            return NWPathNetworkProvider()
+            #else
+            // Network framework is Apple-only; return mock so Linux tests still run.
+            return MockNetworkProvider()
+            #endif
+        }
+    }
+}
